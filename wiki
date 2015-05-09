@@ -1,0 +1,10 @@
+#!/bin/bash
+# run wiki file
+
+if [ "$#" -ne 1 ]; then 
+    echo "Usage: wikit <file.wiki>"
+    exit
+fi
+
+cd Wikify
+java $1 
