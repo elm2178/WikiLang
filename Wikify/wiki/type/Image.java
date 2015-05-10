@@ -149,6 +149,7 @@ public class Image extends DataType{
             lbl.setIcon(icon);
             frame.add(lbl);
             frame.setVisible(true);
+            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         }
 
     }

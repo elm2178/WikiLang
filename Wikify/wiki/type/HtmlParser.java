@@ -4,258 +4,419 @@ public class HtmlParser{
     private String[] page;
     private int x;
     private int y;
+    private String mode;
+    private boolean skipContents;
+    private boolean getLink;
+    private String[] output;
+    private String[][] table;
+    private int index;
+    private int columns;
+    private int rows;
+    private int indent;
+    private int[] olCount;
 
     public HtmlParser(String[] page){
         this.page = page;
+        getLink = false;
+        skipContents = true;
         x = 0; //array index
         y = 0; //String index
     }
 
-   public String[] returnInfobox(){
-    	x=0;y=0;
-    	String special = "infobox";
-    	boolean subtitle=false;
-    	boolean title=false;
-    	int tableCounter=0;
-    	String[] output = new String[1000];
-    	int parCount=0;
-    	String tag="";
-    	String tempout="";
-    	while(!end()){
-
-    	goback1:
-    	if(show(1).equals("<")){
-    	tag = tagger();
-    	if(tag.length()>5){
-    	if(tag.substring(0,5).equals("table")&&tag.contains(special)){
-    	tableCounter++;
-    	special="asdkfjalsdjv";
-    	while(true){
-    		while(show(1).equals("<")){
-    			tag = tagger(); //gets tag. position of vector is now right after tag
-    			if(tag.length()>5){
-    				if(tag.substring(0,5).equals("table")){
-    				tableCounter++;
-    				}
-    			}
-    			if(tag.length()>3){
-    				if(tag.substring(0,2).equals("th")){
-    				title=true;
-    				}
-    			}                            
-    			if(tag.length()>3){
-    				if(tag.substring(0,2).equals("td")){
-    				subtitle=true;
-    				}
-    			}
-
-    			if(tag.equals("/table")){ //if endtag
-    				tableCounter--;
-    				if(tableCounter==0){
-    					System.out.println(tempout);
-    					output[parCount++] = tempout;
-    					tempout = "";
-    					break goback1;
-    					}
-    					}
-    				}
-    				String temp="";
-    				if(title){
-    					tempout+="\n";
-    				title=false;
-    				}
-    				if(subtitle){
-    					tempout+="\n\t";
-    					subtitle=false;
- 				}
-
-    				temp += getString(ahead("<"));
-    				if(tempout!=null)
-    					tempout+=temp+" ";
-    				}
-    			}
-    		}
-
-    		}
-    		else{
-    		skip(ahead("<"));
-		}
-    	}
-    	String[] temp = new String[parCount]; //Get rid off nulls
-    	for(int x=0; x<3; x++)
-    		temp[x] = output[x];
-    	output = temp;
-    	return output;
-    	
-    }   
-
-
-
-
-    //returns an array containing the infobox material
-    public void getInfobox(){
-	x=0;
-	y=0;
-	String special = "infobox";
-	boolean subtitle=false;
-	boolean title=false;
-	int tableCounter=0;
-	String[] output = new String[1000];
-	int parCount=0;
-	String tag="";
-	String tempout="";
-        while(!end()){
-
-goback1:
-            if(show(1).equals("<")){
-                tag = tagger();
-		if(tag.length()>5){
-                    if(tag.substring(0,5).equals("table")&&tag.contains(special)){
-			tableCounter++;
-			special="asdkfjalsdjv";
-			while(true){
-			while(show(1).equals("<")){
-                            tag = tagger(); //gets tag. position of vector is now right after tag
-			    if(tag.length()>5){
-                    		if(tag.substring(0,5).equals("table")){
-				   tableCounter++;
-			    	}
-			    }
-			    if(tag.length()>3){
-				if(tag.substring(0,2).equals("th")){
-				    title=true;
-				}
-			    }                            
-                            if(tag.length()>3){
-                                if(tag.substring(0,2).equals("td")){
-                                    subtitle=true;
-                                }
-                            }
-
-			    if(tag.equals("/table")){ //if endtag
-				tableCounter--;
-				if(tableCounter==0){
-				    System.out.println(tempout);
-                                    output[parCount++] = tempout;
-                                    tempout = "";
-                                    break goback1;
-				}
-                            }
-			}
-			String temp="";
-			if(title){
-			    tempout+="\n";
-			    title=false;
-			}
-			if(subtitle){
-			    tempout+="\n\t";
-			    subtitle=false;
-			}
-			
-			temp += getString(ahead("<"));
-			if(tempout!=null)
-				tempout+=temp+" ";
-		    }
-		    }
-		}
-	     	
-	     }
-	     else{
-		 skip(ahead("<"));
-	     }
-	}
-    }                            
-
-    public void getTables(){
-        x=0;
-        y=0;
+    public String[] returnInfobox(){
+        x=0;y=0;
+        String special = "infobox";
+        boolean subtitle=false;
+        boolean title=false;
+        int tableCounter=0;
         String[] output = new String[1000];
         int parCount=0;
         String tag="";
         String tempout="";
         while(!end()){
-
-goback1:
+    
+            goback1:
             if(show(1).equals("<")){
                 tag = tagger();
                 if(tag.length()>5){
-                    if(tag.substring(0,5).equals("table")){
+                    if(tag.substring(0,5).equals("table")&&tag.contains(special)){
+                        tableCounter++;
+                        special="asdkfjalsdjv";
                         while(true){
-                        while(show(1).equals("<")){
-                            tag = tagger(); //gets tag. position of vector is now right after tag
-                            if(tag.equals("/table")){ //if endtag
-                                System.out.println(tempout);
-                                output[parCount++] = tempout;
-                                tempout = "";
-                                break goback1;
+                            while(show(1).equals("<")){
+                                tag = tagger(); //gets tag. position of vector is now right after tag
+                                if(tag.length()>5){
+                                    if(tag.substring(0,5).equals("table")){
+                                        tableCounter++;
+                                    }
+                                }
+                                if(tag.length()>3){
+                                    if(tag.substring(0,2).equals("th")){
+                                        title=true;
+                                    }
+                                }                            
+                                if(tag.length()>3){
+                                    if(tag.substring(0,2).equals("td")){
+                                        subtitle=true;
+                                    }
+                                }
+    
+                                if(tag.equals("/table")){ //if endtag
+                                    tableCounter--;
+                                    if(tableCounter==0){
+                                        System.out.println(tempout);
+                                        output[parCount++] = tempout;
+                                        tempout = "";
+                                        break goback1;
+                                    }
+                                }
                             }
+                            String temp="";
+                            if(title){
+                                tempout+="\n";
+                                title=false;
+                            }
+                            if(subtitle){
+                                tempout+="\n\t";
+                                subtitle=false;
+                            }
+    
+                            temp += getString(ahead("<"));
+                            if(tempout!=null)
+                                tempout+=temp+" ";
                         }
-                        tempout += getString(ahead("<"))+" ";
-                    }
                     }
                 }
-
-             }
-             else{
-                 skip(ahead("<"));
-             }
-        }
-    }
-
-    public String[] getParagraphs(){ //Returns an array with all paragraphs on a Wikipage
-	x=0;
-	y=0;
-        String[] output = new String[1000];
-        int parCount = 0;
-        String tag = "";
-        String tempout = "";
-
-        while(!end()){
-
-goback:
-            if(show(1).equals("<")){
-
-                tag = tagger();
-
-                if(tag.equals("p")){
-
-                    while(true){
-
-                        while(show(1).equals("<")){
-                            tag = tagger(); //gets tag. position of vector is now right after tag
-                            if(tag.equals("/p")){ //if endtag
-                                output[parCount++] = tempout;
-                                tempout = "";
-                                break goback;
-                            }
-                            else if(tag.substring(0,1).equals("/"))
-                                ;
-                            else if(tag.substring(0,1).equals("a"))            //takes out link tags
-                                ;
-                            else if(tag.equals("b"))                            //takes out bold tags
-                                ;
-                            else if(tag.equals("span"))
-                                skipper("</span>");
-                            else if(tag.length()>2 && tag.substring(0,3).equals("sup")){
-                                skipper("</sup>");
-                            }
-                            else{}
-                                //System.out.println("New Tag: " +tag);
-                        }
-                        tempout += getString(ahead("<"));
-                    }
-                }    	
             }
             else{
                 skip(ahead("<"));
             }
         }
-
         String[] temp = new String[parCount]; //Get rid off nulls
         for(int x=0; x<3; x++)
-            temp[x] = output[x];
+        temp[x] = output[x];
         output = temp;
+        return output;        
+    }   
+
+    public String[] getTables(){
+        x=0;
+        y=0;
+        String special = "infobox";
+        boolean subtitle=false;
+        boolean title=false;
+        int tableCounter=0;
+        String[] output = new String[1000];
+        int parCount=0;
+        String tag="";
+        String tempout="";
+        
+        while(!end()){
+    
+            goback1:
+            if(show(1).equals("<")){
+                tag = tagger();
+            if(tag.length()>5){
+                if(tag.substring(0,5).equals("table")&&tag.contains(special)){
+                    tableCounter++;
+                    special="asdkfjalsdjv";
+                    while(true){
+                        while(show(1).equals("<")){
+                            tag = tagger(); //gets tag. position of vector is now right after tag
+                            if(tag.length()>5){
+                                if(tag.substring(0,5).equals("table")){
+                                    tableCounter++;
+                        }
+                    }
+                    if(tag.length()>3){
+                        if(tag.substring(0,2).equals("th")){
+                            title=true;
+                        }
+                    }                            
+                    if(tag.length()>3){
+                        if(tag.substring(0,2).equals("td")){                                
+                            subtitle=true;
+                        }
+                    }
+    
+                    if(tag.equals("/table")){ //if endtag
+                        tableCounter--;
+                        if(tableCounter==0){
+                            System.out.println(tempout);
+                                output[parCount++] = tempout;
+                                tempout = "";
+                                break goback1;
+                        }
+                    }
+                }
+                String temp="";
+                if(title){
+                    tempout+="\n";
+                    title=false;
+                }
+                if(subtitle){
+                    tempout+="\n\t";
+                    subtitle=false;
+                }
+                
+                temp += getString(ahead("<"));
+                if(tempout!=null)
+                    tempout+=temp+" ";
+                }
+                }
+            }
+                
+             }
+             else{
+             skip(ahead("<"));
+             }
+        }
         return output;
+    }                           
+
+    // public void getTables(){
+    //     x=0;
+    //     y=0;
+    //     String[] output = new String[1000];
+    //     int parCount=0;
+    //     String tag="";
+    //     String tempout="";
+    //     while(!end()){
+
+    //         goback1:
+    //         if(show(1).equals("<")){
+    //             tag = tagger();
+    //             if(tag.length()>5){
+    //                 if(tag.substring(0,5).equals("table")){
+    //                     while(true){
+    //                     while(show(1).equals("<")){
+    //                         tag = tagger(); //gets tag. position of vector is now right after tag
+    //                         if(tag.equals("/table")){ //if endtag
+    //                             System.out.println(tempout);
+    //                             output[parCount++] = tempout;
+    //                             tempout = "";
+    //                             break goback1;
+    //                         }
+    //                     }
+    //                     tempout += getString(ahead("<"))+" ";
+    //                 }
+    //                 }
+    //             }
+    //          }
+    //          else{
+    //              skip(ahead("<"));
+    //          }
+    //     }
+    // }
+
+
+    public String[] getParagraphs(){ //Returns an array with all paragraphs on a Wikipage
+    	x=0;
+    	y=0;
+
+    	output = new String[1000];
+    	index = 0;
+    	mode = "par";
+    	skip(ahead("<h1>"));
+    	rec(tagger(), mode);
+
+        //remove nulls
+        int counter = 0;
+        for(int x=0; output[x]!=null; x++)
+            counter++;
+        
+        String[] temp = new String[counter];
+        for(int x=0; x<counter; x++)
+            temp[x] = output[x];
+
+    	return temp;
+    }
+
+    public String[] getHeaders(){
+        x=0;
+        y=0;
+
+        output = new String[1000];
+        index = 0;
+        mode = "par";
+        skip(ahead("<h1>"));
+        rec(tagger(), mode);
+
+        //remove nulls
+        String[] temp = new String[1000];
+        //Remove nulls and sort out links
+        int counter = 0;
+        for(int x=0; output[x]!=null; x++){
+            if(output[x].contains("<h1>")||output[x].contains("<h2>")||output[x].contains("<h3>"))
+                temp[counter++] = output[x];
+        }
+        
+        String[] output = new String[counter];
+        for(int x=0; x<counter; x++)
+            output[x] = temp[x];
+
+        return output;
+    }
+
+    public String[] getLinks(){
+        x=0;
+        y=0;
+
+        output = new String[1000];
+        index = 0;
+        getLink = true;
+        mode = "par";
+        skip(ahead("<h1>"));
+        rec(tagger(), mode);
+
+        String[] temp = new String[1000];
+        //Remove nulls and sort out links
+        int counter = 0;
+        for(int x=0; output[x]!=null; x++){
+            if(output[x].contains("__LINK__"))
+                temp[counter++] = output[x].substring(8);
+        }
+        
+        String[] output = new String[counter];
+        for(int x=0; x<counter; x++)
+            output[x] = temp[x];
+
+        return output;
+    }
+
+    private String rec(String tag, String req){
+        //System.out.println("rec("+tag+", "+req+")");
+        //If getLink=true Wikilinks are stored to output
+        if(getLink && tag.substring(0,1).equals("a")){
+            if(tag.contains("href=\"/wiki/")){
+                String temp = tag.substring(tag.indexOf("\"")+1);
+                temp = temp.substring(0, temp.indexOf("\""));
+                if(!temp.contains(":"))
+                    output[index++] = "__LINK__http://wikipedia.org"+temp;
+            }
+        }
+        //"par" mode is the only mode implemented for rec function so far
+    	if(req.equals(mode)){
+            //ends parsing after main content of page
+            if(tag.equals("div class=\"printfooter\"")){
+                ;
+            }
+            else if(mode.equals("par")){
+                //Adds p tags to the output
+                if(tag.equals("p")){
+                    output[index++] = getString(ahead("<")) + rec(tagger(), "p");
+                    skip(ahead("<"));
+                    rec(tagger(), "par");
+                }
+                //Adds h1 and h2 headers to output 
+                else if(tag.length()>1 && (tag.substring(0,2).equals("h1")||tag.substring(0,2).equals("h2")||tag.substring(0,2).equals("h3"))){
+                    String temp = "<"+tag.substring(0,2)+">" + getString(ahead("<")) + rec(tagger(), tag.substring(0,2)) + "</"+tag.substring(0,2)+">";
+                    
+                    //Skip Table of Contents if requested
+                    if(skipContents && temp.equals("<h2>Contents</h2>"))
+                        skip(ahead("<p>"));
+                    //Skips References
+                    else if(temp.equals("<h2>References</h2>"))
+                        skip(ahead("<h2>"));
+                    else{
+                        output[index++] = temp;
+                        skip(ahead("<"));
+                    }
+                    rec(tagger(), "par");
+                }
+                //Includes ordered and unordered lists in output
+                else if(tag.length()>1 && (tag.substring(0,2).equals("ul")||tag.substring(0,2).equals("ol"))){
+                    skip(ahead("<"));
+                    indent = 0;
+                    olCount = new int[]{1,1,1,1,1,1,1,1,1,1};
+                    rec(tagger(), tag.substring(0,2));
+                    rec(tagger(), "par");
+                }
+                //Skips over table content
+                else if(tag.length()>4 && tag.substring(0,5).equals("table")){
+                    skipper("</table>");
+                    skip(ahead("<"));
+                    rec(tagger(), "par");
+                }
+                else if(!end()){
+                    skip(ahead("<"));
+                    rec(tagger(), "par");
+                }
+    		}
+    		else if(!end()){
+    			skip(ahead("<"));
+    			rec(tagger(), mode);
+    		}
+    	}
+    	else{
+            //skips sup tags
+    		if(tag.length()>2 && tag.substring(0,3).equals("sup")){
+    			skipper("</sup>");
+    			return getString(ahead("<")) + rec(tagger(), req);
+    		}
+            //handles a tags
+    		else if(tag.length()>0 && tag.substring(0,1).equals("a")){
+                return getString(ahead("<")) + rec(tagger(), "a") + getString(ahead("<")) + rec(tagger(), req);
+    		}
+            //handles bold and italic tags
+    		else if(tag.length()==1 && (tag.substring(0,1).equals("i")||tag.substring(0,1).equals("b"))){ //handles italic and bold
+    			//return "<"+tag.substring(0,1)+">" + getString(ahead("<")) + rec(tagger(), tag.substring(0,1)) + "</"+tag.substring(0,1)+">" + getString(ahead("<")) + rec(tagger(), req);
+                return getString(ahead("<")) + rec(tagger(), tag.substring(0,1)) + getString(ahead("<")) + rec(tagger(), req);
+    		}
+            //handles h1 and h2 headlines
+    		else if(tag.length()>23 && tag.substring(0,24).equals("span class=\"mw-headline\"") && (req.equals("h1")||req.equals("h2")||req.equals("h3"))){
+    			String temp = getString(ahead("<"));
+                skip(ahead("</"+req));
+                return temp + rec(tagger(), req);
+    		}
+            //Handles list entries
+            else if(tag.length()>1 && tag.substring(0,2).equals("li") && (req.equals("ul")||req.equals("ol"))){
+            	if(req.equals("ul")){
+            		output[index++] = new String(new char[indent]).replace("\0", "\t") + "- " + getString(ahead("<")) + rec(tagger(), "li");
+                }
+            	else{
+            		output[index++] = new String(new char[indent]).replace("\0", "\t") +" "+ Integer.toString(olCount[indent]++) + ". " + getString(ahead("<")) + rec(tagger(), "li");
+                }
+
+            	skip(ahead("<"));
+            	rec(tagger(), req);
+            }
+            //Handles Lists within lists
+            else if(req.equals("li") && tag.length()>1 && (tag.substring(0,2).equals("ul")||tag.substring(0,2).equals("ol"))){
+                if(tag.equals("ul")){
+                    indent++;
+                    rec(tagger(), tag.substring(0,2));
+                    indent--;
+                }
+                else{
+                    indent++;
+                    rec(tagger(), tag.substring(0,2));
+                    olCount[indent] = 1;
+                    indent--;
+                }   
+            }
+            //handles end tags
+    		else if(tag.length()>1 && tag.substring(0,1).equals("/")){
+    			if(tag.equals("/"+req)){
+    				return "";
+    			}
+    			else if(req.equals(mode)){
+    				skip(ahead("<"));
+    				rec(tagger(), mode);		
+    			}
+    			else{
+    				return getString(ahead("<")) + rec(tagger(), req);
+    			}
+    		}
+    		else if(tag.equals("/html")||tag.equals("/body")){
+    			return "";
+    		}
+            else{
+                skip(ahead("<"));
+                return rec(tagger(), req);
+            }
+    	}
+    	return "";
     }
 
     private String tagger(){ //finds and returns tag
@@ -263,6 +424,8 @@ goback:
         next();
         int x = ahead(">");
         tag = getString(x);
+        if(tag.contains("<"))
+            tag = tag.substring(tag.indexOf("<")+1);
         next();
         //System.out.println("TAG: "+tag);
         return tag;
@@ -272,7 +435,7 @@ goback:
         skip(ahead(s)+s.length());
     }
 
-    private String get(){ //returns a "size" long String. Position vector moves on
+    private String get(){ //returns a String of size 1. Position vector moves on
         String out = page[x].substring(y,y+1);
         next();
         return out;
@@ -280,8 +443,13 @@ goback:
 
     private String getString(int size){ //returns a "size" long String. Position vector moves on
         String out = "";
+        
+        if(size == -1)
+        	return "";
+
         for(int i=0; i<size; i++)
             out += get();
+        //System.out.println("STRING: "+out);
         return out;
     }
 
@@ -291,13 +459,18 @@ goback:
         return out;
     }
 
+    //Now returns -1 if it fails
     private int ahead(String s){ //Looks ahead for a certain String, returns the distance to the first char of String
         int a=x;
         int b=y;
         int counter=1;
         String temp = "";
 
+        if(s.equals("<")&&show(1).equals("<"))
+        	return 0;
+
         for(int i=0; i<s.length(); i++){
+        	
             if(b<page[a].length()-1)
                 b++;
             else if(a!=page.length-1){
@@ -307,15 +480,13 @@ goback:
                 b=0;
             }
             else{
-                System.err.println("End of HTML reached!");
-                System.err.println("ahead(String s) failed.");
-                System.exit(-1);
+                //System.err.println("End of HTML reached!");
+                return -1;
             }
-
             temp+=page[a].substring(b,b+1);
         }
 
-        while(!s.equals(temp)&&!end()){
+        while(!s.equals(temp)){
             counter++;
 
             if(b<page[a].length()-1)
@@ -327,9 +498,8 @@ goback:
                 b=0;
             }
             else{
-                System.err.println("End of HTML reached!");
-                System.err.println("ahead(String s) failed.");
-                System.exit(-1);
+                //System.err.println("End of HTML reached!");
+                return -1;
             }
 
             temp = temp.substring(1,s.length()) + page[a].substring(b,b+1);
@@ -373,154 +543,6 @@ goback:
     }
 
     private boolean end(){
-        return(x == page.length-1);//&&(y == page[x.length()-1].length()-1));
+        return((x == page.length-1)&&(y == page[x].length()-1));
     }
-
-///////////////////////
-public class Matrix {
-	double[][] data;
-	public int row;
-	public int column;
-
-	public Matrix(int rows, int columns){
-
-		this.row = rows;
-		this.column = columns;
-		data = new double[rows][columns];
-	}
-	
-	//multi
-	public Matrix scM(double a){
-		Matrix M = this;
-		for(int i=0; i<row; i++){
-			for(int j=0; j<column; j++){
-				M.data[i][j] *= a;
-			}
-		}
-		return M;
-	}
-	
-	public double sta(){
-		Matrix M = this;
-		double m = 0.0; 
-		for(int i = 0; i<M.row; i++){
-			m += M.data[i][0]*M.data[i][0];
-		}
-		m = Math.pow(m, 0.5);
-		return m;
-	}
-	
-	public void swap(int i, int j){
-		Matrix M = this;
-		double[] temp = M.data[i];
-		M.data[i] = M.data[j];
-		M.data[j] = temp;
-	}
-
-	public Matrix transpose() {
-		Matrix M = new Matrix(column, row);
-		for (int i = 0; i<row; i++){
-			for (int j = 0; j<column; j++){
-				M.data[j][i] = this.data[i][j];
-			}
-		}
-		//M.printTest();
-		return M;
-	}
-
-	//A*B
-	public Matrix matrixMult(Matrix B){
-		Matrix A = this;
-		Matrix C = new Matrix(A.row, B.column);
-		for (int i = 0; i<C.row; i++)
-			for (int j = 0; j<C.column; j++)
-				for (int k = 0; k<A.column; k++)
-					C.data[i][j]+=(A.data[i][k]*B.data[k][j]);
-		//C.printTest();
-		return C;
-	}
-
-	//invert square matrix
-	public Matrix invert(){
-		Matrix A = this;
-		Matrix inverse = new Matrix(A.row, A.column);
-		for(int i = 0; i<inverse.row; i++){
-			inverse.data[i][i] = 1.0;
-		}
-		//eliminate
-		for (int i = 0; i<row; i++) {
-			int max = i;
-			for (int j=i+1; j<row; j++)
-				if (Math.abs(A.data[j][i]) > Math.abs(A.data[max][i]))
-					max = j;
-			
-			//swaps in both matrices
-			A.swap(i, max);
-			inverse.swap(i, max);
-			
-			for (int j=i+1; j<row; j++) {
-				double m = A.data[j][i] / A.data[i][i];
-				for (int k = 0; k < column; k++) {
-					A.data[j][k] -= A.data[i][k]*m;
-					inverse.data[j][k] -= inverse.data[i][k]*m;
-				}
-				A.data[j][i] = 0.0;
-			}
-		}
-		int y = A.column-1;
-		int x = A.row-1;
-		
-		while(x > 0){
-			//inverse.printTest();
-			double piv = A.data[x][y];
-			int w;
-			for(w = x-1; w >= 0; w--){
-				if(A.data[w][y] != 0){
-					break;
-				}
-			}
-			if(A.data[w][y] != 0){
-				double m = A.data[w][y] / piv;
-				A.data[w][y] = 0;
-				for(int t = A.column-1; t>=0; -- t){
-					inverse.data[w][t] -= m*inverse.data[x][t];
-				}
-			}y--;
-			x--;
-		}
-		//Make pivots 1
-		for(int k = 0; k<A.row; k++){
-			int l = 0; 
-			while(l<A.column){
-				inverse.data[k][l] = inverse.data[k][l]/A.data[k][k];
-				l++;
-			}
-			A.data[k][k] = 1;
-		}
-		
-		//return inverse matrix to caller
-		return inverse;
-	}
-
-	//tester for printing matrices
-	public void printTest(){
-		Matrix A = this;
-		for(int i = 0; i<A.row; i++){
-			for(int j = 0; j<A.column; j++){
-				System.out.print(A.data[i][j]+" ");
-			}
-			System.out.println();
-		}
-	}	
-}
-
-
-
-
-
-
-
-
-
-//////////////////
 }

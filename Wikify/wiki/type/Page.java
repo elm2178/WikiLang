@@ -2,10 +2,10 @@ package wiki.type;
 import java.net.*;
 import java.io.*;
 import java.util.Arrays;
+
 import org.apache.poi.xwpf.usermodel.*;
 
-
-public class Page extends DataType{
+public class Page{
     private String url;
     private String[] html;
     private HtmlParser parser;
@@ -44,8 +44,7 @@ public class Page extends DataType{
 
                 if(i == buffer.length)
                     buffer = Arrays.copyOf(buffer, buffer.length *2);
-		//remove weird wikipedia character sequence "&#160" from document
-		line=line.replace("&#160","");
+
                 buffer[i] = line;
                 i++;
             }
@@ -64,6 +63,39 @@ public class Page extends DataType{
         return parser.getParagraphs();
     }
 
+    public String[] getTables(){
+        return parser.getTables();
+    }
+
+    public String[] getLinks(){
+        return parser.getLinks();
+    }
+
+    public String[] getHeaders(){
+        return parser.getHeaders();
+    }
+	
+    public String[] returnInfobox(){
+	System.out.println("Looking for tables!!!");
+	   return parser.returnInfobox();
+    }
+
+    //asks user for input --> will automatically search wiki for search terms
+    public void urlPrompt(){
+	try{
+	System.out.println("Please input your search term(s): ");
+	BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+	String s = br.readLine();
+	s = s.replace(",","");
+	s = s.replace(";","");
+	s = s.replace(" ","_");
+	this.url = "http://www.wikipedia.org/wiki/"+s;
+	this.html = getHtml();
+        this.parser = new HtmlParser(html);
+	} catch (Exception e){
+            System.out.println("No Internet Connection!");
+	}
+    }
     
     public void toWord(String fileName){
         String[] paragraphs = this.getParagraphs();
@@ -80,6 +112,12 @@ public class Page extends DataType{
 	for (int i=0; i< paragraphs.length; i++){
 	    XWPFParagraph p = doc.createParagraph();
 	    XWPFRun r = p.createRun();
+	    if (paragraphs[i].contains("<h")){
+	    	paragraphs[i] = paragraphs[i].replaceAll("<h.*?>", "");
+	    	paragraphs[i] = paragraphs[i].replaceAll("</h.*?>", "");
+	    	r.setBold(true);
+	   
+	    }
 	    r.setText(paragraphs[i]);
 	    r.addBreak();
 	}
@@ -94,32 +132,10 @@ public class Page extends DataType{
 	}
     }
 
-    public void getInfobox(){
-	parser.getInfobox();
-    }
 
-    public void getTables(){
-	parser.getTables();
-    }
+    //DOES NOT WORK
+    // public int getType() {
+    //     return DataType.PAGE;
+    // }
 
-    //asks user for input --> will automatically search wiki for search terms
-    public void urlPrompt(){
-	try{
-	System.out.println("Please input your search term(s): ");
-	BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-	String s = br.readLine();
-	s = s.replace(",","");
-	s = s.replace(";","");
-	s = s.replace(" ","_");
-	this.url = "http://www.wikipedia.org/wiki/"+s;
-	this.html = getHtml();
-        this.parser = new HtmlParser(html);
-	} catch (Exception e){
-		e.printStackTrace();
-	}
-    }
-
-    public int getType() {
-        return DataType.PAGE;
-    }
 }
