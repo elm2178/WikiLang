@@ -7,4 +7,4 @@ if [ "$#" -ne 1 ]; then
 fi
 
 cd Wikify
-java $1 
+java -cp .:xmlbeans.jar:jsoup-1.7.2.jar:poi-3.11.jar:ooxml.jar:schemas.jar:jxl.jar:antlr-4.5-complete.jar $1 

@@ -1,4 +1,4 @@
-
+package wiki.type;
 import java.util.*;
 import java.io.*;
 
@@ -120,7 +120,7 @@ public class Table {
 	 * row 1 xxx; xxx; ...
 	 * ....
 	 */
-	public void print(){
+	public void printTable(){
 		int rows = table.length;
 		int cols = table[0].length;
 		System.out.println("\nTable");
