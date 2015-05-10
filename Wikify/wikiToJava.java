@@ -78,7 +78,14 @@ public class wikiToJava extends WikiBaseListener {
             buffer += matchJava(ctx.type().getText());
 
         buffer = buffer+ctx.ID().getText()+"("; 
-        System.out.print(buffer);
+        if(ctx.args() != null) {
+            System.out.print(buffer);
+        }
+        else
+        {
+            System.out.println(buffer+") {");
+        }
+
     }
 
     public void enterArgs(WikiParser.ArgsContext ctx) {

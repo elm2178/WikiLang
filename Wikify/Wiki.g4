@@ -100,7 +100,7 @@ static_fcall: ID '.' ID '('expr')'
     ;
 
 /* Function Definition *******/
-func: FUNC (type|) ID'('args')' NL func_stmt (ret_stmt|) END # FuncDef
+func: FUNC (type|) ID ('('args')'|'()') NL func_stmt (ret_stmt|) END # FuncDef
     ;
 
 func_stmt: stmt NL func_stmt        # FuncStmt
