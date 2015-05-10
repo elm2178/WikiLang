@@ -4,6 +4,11 @@ grammar Wiki;
 /* Lennart just tried github push*/
 /* The Start Production */
 /* at some point I would like to add import statements */
+@header {
+}
+
+@members {
+}
 
 prog: import_seq prog_seq
     ;
@@ -185,7 +190,7 @@ NEQ: '!=';
 PP: '++';
 MM: '--';
 /* Keywords in Wikify *******/
-INT: 'num';
+INT : 'num'; 
 STRING: 'string';
 BOOL: 'bool';
 TABLE: 'table';

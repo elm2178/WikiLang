@@ -11,13 +11,12 @@ public class wikiToJava extends WikiBaseListener {
     public static final int TABLE= 3;
     public static final int IMAGE= 4;
     /**************************/
-    String filename;
-
     ByteArrayOutputStream stream = new ByteArrayOutputStream();
     PrintStream old = System.out; 
     private static int func_flag = 0;
     private static int class_flag = 0;
 
+    String filename;
     public wikiToJava(String filename) {
         this.filename = filename;
     }
