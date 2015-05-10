@@ -144,6 +144,7 @@ str_expr: STRLIT '+' str_expr       # ConcatStr
     | static_fcall '+' str_expr     # ConcatFcall
     | STRLIT                        # StrLit
     | ident                         # IdString
+    | static_fcall                  # FCallStr
     ;
 /****************************/
 
