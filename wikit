@@ -16,11 +16,10 @@ RESULT="${first/wiki/$STR}"
 ARG="${first/.wiki/$EMPTY}"
 #file.wiki becomes file.java
 
-cat ../$1 | exec java Test $ARG
+cat ../$1 | exec java -cp .:$PWD/antlr-4.5-complete.jar Test $ARG
 javac $RESULT
 
 if [ -f $PWD/../$ARG ]; then
-    echo $PWD/../$ARG
     rm $PWD/../$ARG
 fi
 cd ../

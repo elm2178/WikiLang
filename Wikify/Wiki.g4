@@ -29,7 +29,7 @@ seq: func_seq
     | NL
     ;
 
-main_func: MAIN '()' NL stmt_seq END 
+main_func: MAIN '()' NL (stmt_seq|) END 
     ;
 
 stmt_seq: stmt NL stmt_seq
