@@ -96,9 +96,13 @@ public class wikiToJava extends WikiBaseListener {
     }
 
     public void enterRetExpr(WikiParser.RetExprContext ctx) {
-        System.out.println("return " 
-                + ctx.expr().getText() 
-                + ";");
+        if(ctx.expr() != null) {
+            System.out.println("return " 
+                    + ctx.expr().getText() 
+                    + ";");
+        }
+        else
+            System.out.println("return;");
     }
 
     public void exitFuncDef(WikiParser.FuncDefContext ctx) {

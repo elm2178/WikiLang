@@ -6,6 +6,7 @@ if [ "$#" -ne 1 ]; then
     exit
 fi
 
+set -e
 cd Wikify
 
 STR="java"
@@ -15,13 +16,13 @@ RESULT="${first/wiki/$STR}"
 ARG="${first/.wiki/$EMPTY}"
 #file.wiki becomes file.java
 
+cat ../$1 | exec java Test $ARG
+javac $RESULT
+
 if [ -f $PWD/../$ARG ]; then
     echo $PWD/../$ARG
     rm $PWD/../$ARG
 fi
-
-cat ../$1 | exec java Test $ARG
-javac $RESULT
 cd ../
 ln -s Wikify/$ARG.java $ARG
 
